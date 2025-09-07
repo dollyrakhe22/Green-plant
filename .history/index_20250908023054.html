@@ -120,13 +120,14 @@ const loadTree=(id)=>{
     .then((res)=> res.json())
     .then(data=> displayPlantCards(data.plants));
 };
+   
 const displayPlantCards = (cards) => {
     const cardContainer = document.getElementById('card-container');
     cardContainer.innerHTML = "";
 
-    for (let card of cards) {
+    cards.forEach(card => {
         const cardDiv = document.createElement('div');
-        cardDiv.className = "bg-white rounded-xl shadow-md overflow-hidden flex flex-col";
+        cardDiv.className = "bg-white rounded-xl shadow-md overflow-hidden flex flex-col w-full";
 
         cardDiv.innerHTML = `
             <img class="w-full h-64 object-cover" src="${card.image}" alt="${card.name}">
@@ -140,8 +141,8 @@ const displayPlantCards = (cards) => {
                 <button class="bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-3xl mt-3 w-full transition-colors duration-200">Add to Cart</button>
             </div>
         `;
-        cardContainer.appendChild(cardDiv);
-    }
+        cardContainer.append(cardDiv);
+    });
 };
 
 

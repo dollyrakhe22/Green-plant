@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Earth</title>
+    <!-- font-awesome cdn -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <!-- tailwind + daisyui -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;600&family=Manrope:wght@200;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#DCFCE7] font-sans">
+
+    <!-- Navbar -->
+    <nav class="navbar bg-[#15803d] shadow-sm px-4 md:px-10 text-white">
+        <div class="navbar-start">
+            <a class="text-xl font-bold">Green Earth</a>
+        </div>
+    </nav>
+
+    <!-- Main Section -->
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <div class="text-3xl font-bold text-center mb-8">Choose Your Trees</div>
+        <div class="grid grid-cols-12 gap-6">
+            
+            <!-- Categories Sidebar -->
+            <aside class="col-span-12 md:col-span-3">
+                <h2 class="text-lg font-semibold mb-4">Categories</h2>
+                <div id="categories-container" class="flex flex-col gap-2 mt-2"></div>
+            </aside>
+
+            <!-- Plant Cards Grid -->
+            <section class="col-span-12 md:col-span-6">
+                <div id="card-container" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </section>
+
+            <!-- Cart Sidebar -->
+            <aside class="col-span-12 md:col-span-3">
+                <div class="card bg-base-100 shadow-sm sticky top-24">
+                    <div class="card-body">
+                        <h3 class="card-title">Your Cart</h3>
+                        <ul id="cartList" class="divide-y text-sm"></ul>
+                        <div class="flex justify-between items-center pt-2 font-semibold">
+                            <span>Total</span>
+                            <span id="cartTotal">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Modal Container -->
+    <div id="modal-container"></div>
+
+    <!-- JS -->
+    <script>
+        // Load Categories
+        const loadCategories = () => {
+            const url = "https://openapi.programming-hero.com/api/categories";
+            fetch(url)
+            .then(res => res.json())
+            .then(json => displayCategories(json.categories));
+        };
+
+        const displayCategories = (categories) => {
+            const categoriesContainer = document.getElementById('categories-container');
+            categoriesContainer.innerHTML = "";
+            for(let category of categories){
+                const btnDiv = document.createElement('div');
+                btnDiv.innerHTML = `<button class="text-left px-3 py-2 rounded-md w-full text-[#1F2937] hover:bg-green-900 hover:text-white" onclick="loadTree('${category.id}')">${category.category_name}</button>`;
+                categoriesContainer.append(btnDiv);
+            }
+        };
+
+        // Load Trees
+        const loadTree = (id) => {
+            const url = `https://openapi.programming-hero.com/api/category/${id}`;
+            fetch(url)
+            .then(res => res.json())
+            .then(data => displayPlantCards(data.plants));
+        };
+
+        const displayPlantCards = (cards) => {
+            const cardContainer = document.getElementById('card-container');
+            cardContainer.innerHTML = "";
+
+            for (let card of cards) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = "bg-white rounded-xl shadow-md overflow-hidden flex flex-col";
+
+                cardDiv.innerHTML = `
+                    <img class="w-full h-64 object-cover" src="${card.image}" alt="${card.name}">
+                    <div class="p-4 flex flex-col gap-2">
+                        <h3 class="font-bold text-lg md:text-xl cursor-pointer text-green-700 modal-button"
+                            data-name="${card.name}" 
+                            data-image="${card.image}" 
+                            data-description="${card.description || ''}" 
+                            data-price="${card.price}" 
+                            data-category="${card.category}"
+                        >${card.name}</h3>
+                        <p class="text-gray-600 line-clamp-3">${card.description || ''}</p>
+                        <div class="flex justify-between items-center mt-2">
+                            <button class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm">${card.category}</button>
+                            <p class="font-bold text-gray-800">৳${card.price}</p>
+                        </div>
+                        <button class="bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-3xl mt-3 w-full transition-colors duration-200">Add to Cart</button>
+                    </div>
+                `;
+                cardContainer.appendChild(cardDiv);
+            }
+
+            // Modal logic
+            const modalContainer = document.getElementById('modal-container');
+            const modalButtons = document.querySelectorAll('.modal-button');
+
+            modalButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const name = btn.getAttribute('data-name');
+                    const image = btn.getAttribute('data-image');
+                    const description = btn.getAttribute('data-description');
+                    const price = btn.getAttribute('data-price');
+                    const category = btn.getAttribute('data-category');
+
+                    modalContainer.innerHTML = `
+                        <input type="checkbox" id="tree-modal" class="modal-toggle" />
+                        <div class="modal">
+                            <div class="modal-box relative max-w-lg">
+                                <label for="tree-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+                                <img src="${image}" class="w-full h-64 object-cover rounded-lg mb-4" alt="${name}" />
+                                <h3 class="font-bold text-xl mb-2">${name}</h3>
+                                <p class="mb-2">${description}</p>
+                                <p class="font-semibold">Category: ${category}</p>
+                                <p class="font-bold text-green-700 mt-2">Price: ৳${price}</p>
+                            </div>
+                        </div>
+                    `;
+
+                    // Open modal
+                    document.getElementById('tree-modal').checked = true;
+                });
+            });
+        };
+
+        loadCategories();
+    </script>
+</body>
+</html>
