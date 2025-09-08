@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<style>
+    *{
+        font-family: "poppins", sans-serif;
+    }
+    .active{
+        background-color: #065F46;
+        color:white;
+    }
+</style>
+<body class="bg-[#F0FDF4]">
+<header>
+    <nav class="bg-[#15803D] text-white px-6 py-3 flex items-center justify-between">
+    
+        <div class=" font-semibold text-lg">Green Earth</div>
+
+        <ul class=" menu menu-horizontal md:flex gap-2 text-sm ">
+        <li><a href="" class="hover:text-gray-200">About</a></li>
+        <li><a href="" class="hover:text-gray-200">Gallery</a></li>
+        <li><a href="" class="hover:text-gray-200">Plant a Tree</a></li>
+        </ul>
+
+        <button href="" class="bg-[#FACC15] text-[#15803D] font-medium px-4 py-2 rounded-full hover:bg-[#FFFF51]">
+        Plant a Tree
+        </button>
+    </nav>
+   <section class="relative bg-[#CFF0DC] overflow-hidden">
+        <img class="absolute bottom-0 left-0 lg:w-[420px] hidden md:block" src="assets/hero-leaf1.png" alt=""/>
+
+        <img class="absolute right-0 bottom-0 lg:w-[420px] hidden md:block" src="assets/hero-leaf2.png" alt=""/>
+
+        <div class="relative max-w-4xl mx-auto px-6 py-8 md:py-16 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold ">
+                Plant a Tree, Grow a Future
+            </h1>
+            <p class="mt-4 mb-8 max-w-2xl mx-auto text-gray-700">
+            Join our mission to plant 1 million trees and make the Earth greener for future generations.
+            </p>
+            <button href="" 
+            class="bg-[#FACC15] text-[#15803D] font-medium px-4 py-2 rounded-full hover:bg-[#FFFF51]">
+            Get Involved
+            </button>
+        </div>
+    </section>
+</header>
+<main class="max-w-8xl mx-auto px-4">
+    <div class="text-3xl font-bold text-center mt-6">Choose Your Trees</div>
+    <section class="md:px-8 py-10 grid grid-cols-12 gap-6 w-full">
+        <!-- categories -->
+        <aside class="col-span-12 md:col-span-3">
+            <h2 class="text-lg font-semibold mb-4">Categories</h2>
+            <button class="cat-btn text-left px-3 py-2 rounded-md  w-full hover:bg-green-900 hover:text-white active" onclick="loadAllCards()">All Trees</button>
+            <div id="categories-container"class="flex flex-col gap-2">
+            </div>
+        </aside>
+    
+        <section class="col-span-12 md:col-span-9 grid grid-cols-12 gap-6">
+            <div class="col-span-12 lg:col-span-9">
+                <div id="spinner" class="text-center hidden">
+                    <span class="loading loading-spinner text-success w-12 h-12"></span>
+
+                </div>
+                <div id="card-container" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    
+                    
+                    
+                </div>
+            </div>
+
+            <aside class="col-span-12 lg:col-span-3">
+                <div class="card bg-base-100 shadow-sm sticky top-24">
+                <div class="card-body">
+                    <h3 class="card-title">Your Cart</h3>
+                    <ul id="cartList" class="divide-y text-sm">
+                        
+                    </ul>
+                    <div class="flex justify-between items-center pt-2 font-semibold">
+                    <div>Total</div>
+                    <div>৳
+                        <span id="cartTotal">0</span>
+                    </div>
+                    </div>
+                </div>
+                </div>
+            </aside>
+        </section>
+    </section>
+</main>
+
+    
+
+
+
+<!-- <button class="btn" onclick="my_modal_5.showModal()">open modal</button> -->
+<dialog id="plant_modal" class="modal modal-bottom sm:modal-middle">
+  <div class="modal-box">
+    <div id="details-container">
+
+    </div>
+    <div class="modal-action">
+      <form method="dialog">
+        <!-- if there is a button in form, it will close the modal -->
+        <button class="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+
+<script src="te"></script>
+</body>
+</html>

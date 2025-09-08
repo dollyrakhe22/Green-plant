@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plant a Tree</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 text-gray-800">
+
+  <!-- Navbar -->
+  <header class="bg-green-700 text-white p-4 flex justify-between items-center">
+    <h1 class="font-bold text-xl">Green Earth</h1>
+    <nav class="space-x-4">
+      <a href="#" class="hover:underline">Home</a>
+      <a href="#" class="hover:underline">Story</a>
+      <a href="#" class="hover:underline">Contact</a>
+    </nav>
+    <button class="bg-yellow-400 px-4 py-1 rounded text-black">Donate</button>
+  </header>
+
+  <!-- Hero -->
+  <section class="text-center py-10">
+    <h2 class="text-3xl font-bold text-green-700">Plant a Tree, Grow a Future</h2>
+    <p class="text-gray-600 mt-2">Support our campaign by planting trees and making the world greener.</p>
+    <button class="mt-4 bg-green-600 text-white px-5 py-2 rounded">Get Started</button>
+  </section>
+
+  <!-- Layout -->
+  <main class="max-w-6xl mx-auto grid grid-cols-4 gap-6 p-6">
+    <!-- Sidebar Categories -->
+    <aside class="col-span-1 bg-white rounded-lg shadow p-4">
+      <h3 class="font-bold text-lg mb-3">Categories</h3>
+      <ul id="categories" class="space-y-2"></ul>
+    </aside>
+
+    <!-- Trees Section -->
+    <section class="col-span-3">
+      <!-- Spinner -->
+      <div id="trees-spinner" class="hidden text-center py-10">
+        <div class="animate-spin rounded-full h-12 w-12 border-4 border-green-600 border-t-transparent mx-auto"></div>
+        <p class="mt-2">Loading...</p>
+      </div>
+
+      <!-- Trees -->
+      <div id="trees-container" class="grid md:grid-cols-3 gap-6"></div>
+
+      <!-- Cart -->
+      <div class="mt-6 bg-white p-4 rounded shadow">
+        <h3 class="font-bold text-lg mb-2">Your Cart</h3>
+        <ul id="cart-list" class="space-y-1"></ul>
+        <p class="mt-3 font-bold">Total: <span id="total">$0</span></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+      <img src="" alt="" class="w-full h-48 object-cover rounded">
+      <h2 class="text-xl font-bold text-green-700 mt-4"></h2>
+      <p class="text-gray-600 mt-2"></p>
+      <button class="mt-4 bg-red-500 text-white px-4 py-2 rounded">Close</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-green-700 text-white text-center p-4 mt-10">
+    © 2025 Green Earth. All rights reserved.
+  </footer>
+
+  <!-- JS -->
+  <script>
+  // ============================
+  // 🌴 API Endpoints
+  // ============================
+  const ALL_PLANTS_API = "https://openapi.programming-hero.com/api/plants";
+  const ALL_CATEGORIES_API = "https://openapi.programming-hero.com/api/categories";
+  const CATEGORY_API = id => \`https://openapi.programming-hero.com/api/category/\${id}\`;
+  const PLANT_DETAIL_API = id => \`https://openapi.programming-hero.com/api/plant/\${id}\`;
+
+  // ============================
+  // 🌴 Elements
+  // ============================
+  const categoriesContainer = document.getElementById("categories");
+  const treesContainer = document.getElementById("trees-container");
+  const treesSpinner = document.getElementById("trees-spinner");
+  const cartList = document.getElementById("cart-list");
+  const totalElement = document.getElementById("total");
+
+  // ============================
+  // 🌴 Global State
+  // ============================
+  let cart = [];
+
+  // ============================
+  // 🌴 Utils
+  // ============================
+  function show(el) { el.classList.remove("hidden"); }
+  function hide(el) { el.classList.add("hidden"); }
+
+  // ============================
+  // 🌴 Load Categories
+  // ============================
+  function loadCategories() {
+      return fetch(ALL_CATEGORIES_API)
+          .then(res => res.json())
+          .then(data => displayCategories(data.categories))
+          .catch(err => console.log("Category Load Error:", err));
+  }
+
+  function displayCategories(categories) {
+      categoriesContainer.innerHTML = "";
+
+      // All Trees button
+      const allLi = document.createElement("li");
+      allLi.className = "cursor-pointer p-2 rounded bg-green-700 text-white hover:bg-green-800";
+      allLi.textContent = "All Trees";
+      allLi.addEventListener("click", () => loadAllTrees(allLi));
+      categoriesContainer.appendChild(allLi);
+
+      // Dynamic categories
+      categories.forEach(cat => {
+          const li = document.createElement("li");
+          li.className = "cursor-pointer p-2 rounded hover:bg-green-100";
+          li.textContent = cat.category;   // ✅ fixed
+          li.addEventListener("click", () => loadTreesByCategory(cat.id, li));
+          categoriesContainer.appendChild(li);
+      });
+  }
+
+  // ============================
+  // 🌴 Load All Trees
+  // ============================
+  function loadAllTrees(el) {
+      show(treesSpinner);
+      treesContainer.innerHTML = "";
+      fetch(ALL_PLANTS_API)
+          .then(res => res.json())
+          .then(data => {
+              displayTrees(data.plants);
+              if (el) {
+                  clearActiveCategory();
+                  el.classList.add("bg-green-700", "text-white");
+              }
+          })
+          .catch(err => console.log("All Trees Load Error:", err))
+          .finally(() => hide(treesSpinner));
+  }
+
+  // ============================
+  // 🌴 Load Trees by Category
+  // ============================
+  function loadTreesByCategory(id, el) {
+      show(treesSpinner);
+      treesContainer.innerHTML = "";
+      fetch(CATEGORY_API(id))
+          .then(res => res.json())
+          .then(data => {
+              displayTrees(data.data);   // ✅ fixed
+              if (el) {
+                  clearActiveCategory();
+                  el.classList.add("bg-green-700", "text-white");
+              }
+          })
+          .catch(err => console.log("Category Trees Load Error:", err))
+          .finally(() => hide(treesSpinner));
+  }
+
+  // ============================
+  // 🌴 Display Trees
+  // ============================
+  function displayTrees(trees) {
+      treesContainer.innerHTML = "";
+
+      if (!trees || trees.length === 0) {
+          treesContainer.innerHTML = \`<p class="col-span-3 text-center text-gray-500">No trees found.</p>\`;
+          return;
+      }
+
+      trees.forEach(tree => {
+          const card = document.createElement("div");
+          card.className = "bg-white rounded-lg shadow p-4 flex flex-col";
+
+          card.innerHTML = \`
+              <img src="\${tree.image}" alt="\${tree.name}" class="h-40 w-full object-cover rounded">
+              <h3 class="mt-2 font-bold text-lg text-green-700 cursor-pointer hover:underline">\${tree.name}</h3>
+              <p class="text-sm text-gray-600 line-clamp-2">\${tree.description ? tree.description.slice(0, 60) : "No description available"}...</p>
+              <p class="text-xs text-gray-400">Category: \${tree.category}</p>
+              <p class="font-semibold mt-1">$\${tree.price}</p>
+              <button class="mt-auto bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">Add to Cart</button>
+          \`;
+
+          // Modal on title click
+          card.querySelector("h3").addEventListener("click", () => openModal(tree));
+
+          // Add to cart button
+          card.querySelector("button").addEventListener("click", () => addToCart(tree));
+
+          treesContainer.appendChild(card);
+      });
+  }
+
+  // ============================
+  // 🌴 Modal
+  // ============================
+  function openModal(tree) {
+      const modal = document.getElementById("modal");
+      modal.querySelector("h2").textContent = tree.name;
+      modal.querySelector("img").src = tree.image;
+      modal.querySelector("p").textContent = tree.description || "No description available.";
+      modal.classList.remove("hidden");
+
+      // close button
+      modal.querySelector("button").addEventListener("click", () => modal.classList.add("hidden"));
+  }
+
+  // ============================
+  // 🌴 Cart
+  // ============================
+  function addToCart(tree) {
+      cart.push(tree);
+      renderCart();
+  }
+
+  function removeFromCart(id) {
+      cart = cart.filter(item => String(item.id) !== String(id));
+      renderCart();
+  }
+
+  function renderCart() {
+      cartList.innerHTML = "";
+      let total = 0;
+
+      cart.forEach(item => {
+          total += item.price;
+          const li = document.createElement("li");
+          li.className = "flex justify-between items-center p-1";
+          li.innerHTML = \`
+              <span>\${item.name}</span>
+              <button class="text-red-500">❌</button>
+          \`;
+          li.querySelector("button").addEventListener("click", () => removeFromCart(item.id));
+          cartList.appendChild(li);
+      });
+
+      totalElement.textContent = \`$\${total}\`;
+  }
+
+  // ============================
+  // 🌴 Helpers
+  // ============================
+  function clearActiveCategory() {
+      [...categoriesContainer.children].forEach(li => li.classList.remove("bg-green-700", "text-white"));
+  }
+
+  // ============================
+  // 🌴 Initial Load
+  // ============================
+  loadCategories().then(() => {
+      // Default load all trees & set active button
+      const allBtn = categoriesContainer.querySelector("li");
+      if (allBtn) loadAllTrees(allBtn);
+  });
+  </script>
+
+</body>
+</html>
