@@ -153,7 +153,7 @@ function displayTrees(trees) {
             <p class="btn bg-green-200 text-green-700 rounded-full">${escapeHtml(tree.category || "")}</p>
             <p class="font-bold">${BDT(tree.price)}</p>
             </div>
-            <button class="btn add-to-cart bg-green-800 text-white rounded-full w-full mt-2">Add to Cart</button>
+            <button class="btn add-to-cart bg-green-800  text-white  rounded-full w-full mt-2">Add to Cart</button>
             `;
         treesContainer.appendChild(div);
 
@@ -175,14 +175,14 @@ function displayCategories(categories) {
 
   // All Trees button
     const allLi = document.createElement("li");
-    allLi.className = "cursor-pointer p-2 rounded bg-green-700 text-white hover:bg-green-800";
+    allLi.className = "cursor-pointer p-2 rounded bg-green-700 text-white hover:bg-green-900 hover:text-white";
     allLi.textContent = "All Trees";
     allLi.addEventListener("click", () => loadAllTrees(allLi));
     categoriesContainer.appendChild(allLi);
 
     categories.forEach(cat => {
         const li = document.createElement("li");
-        li.className = "cursor-pointer p-2 rounded";
+        li.className = "cursor-pointer p-2 rounded hover:bg-green-700";
         li.textContent = cat.category_name;
         li.addEventListener("click", () => loadTreesByCategory(cat.id, li));
         categoriesContainer.appendChild(li);
