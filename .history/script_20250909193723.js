@@ -230,6 +230,6 @@ function loadTreesByCategory(id, el) {
 
 // initial load
 loadCategories();
-loadAllTrees();  
+loadAllTrees();  // ✅ show all plants by default
 
 

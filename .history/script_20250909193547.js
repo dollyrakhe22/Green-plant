@@ -1,4 +1,4 @@
-// help 
+// helpers 
 const BDT = (n) => `৳ ${Number(n || 0).toLocaleString("en-BD")}`;
 const show = (el) => el.classList.remove("hidden");
 const hide = (el) => el.classList.add("hidden");
@@ -107,13 +107,13 @@ function renderCart() {
 
     // increase/decrease/remove
     li.querySelector(".increase").addEventListener("click", () => {
-        item.qty++;
+        item.q;
         renderCart();
     });
 
     li.querySelector(".decrease").addEventListener("click", () => {
         if (item.qty > 1) {
-            item.qty --;
+            item.qty. pri
         } else {
             cart = cart.filter(i => i.id !== item.id);
         }
@@ -230,6 +230,6 @@ function loadTreesByCategory(id, el) {
 
 // initial load
 loadCategories();
-loadAllTrees();  
+loadAllTrees();  // ✅ show all plants by default
 
 

@@ -1,4 +1,4 @@
-// help 
+// helpers 
 const BDT = (n) => `৳ ${Number(n || 0).toLocaleString("en-BD")}`;
 const show = (el) => el.classList.remove("hidden");
 const hide = (el) => el.classList.add("hidden");
@@ -230,6 +230,6 @@ function loadTreesByCategory(id, el) {
 
 // initial load
 loadCategories();
-loadAllTrees();  
+loadAllTrees();  // ✅ show all plants by default
 
 
